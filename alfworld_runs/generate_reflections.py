@@ -41,7 +41,11 @@ def update_memory(trial_log_path: str, env_configs: List[Dict[str, Any]], model:
             else:
                 memory: List[str] = env['memory']
             reflection_query: str = _generate_reflection_query(env_logs[i], memory)
-            reflection: str = get_completion(model, reflection_query) # type: ignore
+            try:
+                reflection: str = get_completion(model, reflection_query) # type: ignore
+            except Exception as e:
+                print(e)
+                reflection: str = ""
             env_configs[i]['memory'] += [reflection]
                 
     return env_configs
