@@ -13,7 +13,11 @@ from env_history import EnvironmentHistory
 
 from typing import List, Dict, Any, Tuple
  
-openai.api_key = os.environ["OPENAI_API_KEY"]
+# openai.api_key = os.environ["OPENAI_API_KEY"]
+
+openai.api_key = "EMPTY"
+openai.api_base = "http://127.0.0.1:9999/v1"
+
 FOLDER = './prompts'
 PROMPT_FILE = 'alfworld_3prompts.json'
 with open(os.path.join(FOLDER, PROMPT_FILE), 'r') as f:
@@ -23,8 +27,8 @@ def llm(prompt: str, model: Model, stop: List[str] = ["\n"]):
     try:
         cur_try = 0
         while cur_try < 6:
-            if model == "text-davinci-003":
-                text = get_completion(prompt=prompt, temperature=cur_try * 0.2, stop_strs=stop)
+            if ("3.5" not in model) and ("4" not in model) and ("chat" not in model.lower()):
+                text = get_completion(model=model, prompt=prompt, temperature=cur_try * 0.2, stop_strs=stop)
             else:
                 text = get_chat(prompt=prompt, model=model, temperature=cur_try * 0.2, stop_strs=stop)
             # dumb way to do this
@@ -35,8 +39,9 @@ def llm(prompt: str, model: Model, stop: List[str] = ["\n"]):
     except Exception as e:
         print(prompt)
         print(e)
-        import sys
-        sys.exit(1)
+        return ""
+        # import sys
+        # sys.exit(1)
 
 def process_ob(ob):
     if ob.startswith('You arrive at loc '):
@@ -54,7 +59,11 @@ def alfworld_run(env, base_prompt, memory: List[str], to_print=True, ob='', mode
         sys.stdout.flush()
     cur_step = 0
     while cur_step < 49:
-        action = llm(str(env_history) + ">", stop=['\n'], model=model).strip()
+        try:
+            action = llm(str(env_history) + ">", stop=['\n'], model=model).strip()
+        except Exception as e:
+            print(e)
+            return env_history, False
         env_history.add("action", action)
         observation, reward, done, info = env.step([action])
         observation, reward, done = process_ob(observation[0]), info['won'][0], done[0]

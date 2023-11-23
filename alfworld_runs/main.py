@@ -101,7 +101,7 @@ def main(args) -> None:
 
         # update memory if needed
         if args.use_memory:
-            env_configs: List[Dict[str, Any]] = update_memory(trial_log_path, env_configs)
+            env_configs: List[Dict[str, Any]] = update_memory(trial_log_path, env_configs, args.model)
 
         # log env configs for trial
         with open(trial_env_configs_log_path, 'w') as wf:

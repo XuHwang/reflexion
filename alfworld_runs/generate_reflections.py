@@ -26,7 +26,7 @@ def _generate_reflection_query(log_str: str, memory: List[str]) -> str:
     query += '\n\nNew plan:'
     return query
 
-def update_memory(trial_log_path: str, env_configs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def update_memory(trial_log_path: str, env_configs: List[Dict[str, Any]], model: str) -> List[Dict[str, Any]]:
     """Updates the given env_config with the appropriate reflections."""
     with open(trial_log_path, 'r') as f:
         full_log: str = f.read()
@@ -41,7 +41,7 @@ def update_memory(trial_log_path: str, env_configs: List[Dict[str, Any]]) -> Lis
             else:
                 memory: List[str] = env['memory']
             reflection_query: str = _generate_reflection_query(env_logs[i], memory)
-            reflection: str = get_completion(reflection_query) # type: ignore
+            reflection: str = get_completion(model, reflection_query) # type: ignore
             env_configs[i]['memory'] += [reflection]
                 
     return env_configs

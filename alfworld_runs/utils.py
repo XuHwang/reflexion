@@ -14,14 +14,14 @@ else:
     from typing_extensions import Literal
 
 
-Model = Literal["gpt-4", "gpt-3.5-turbo", "text-davinci-003"]
+Model = Literal["gpt-4", "gpt-3.5-turbo", "text-davinci-003", "Llama-2-7b-hf", "Llama-2-13b-hf"]
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
-def get_completion(prompt: str, temperature: float = 0.0, max_tokens: int = 256, stop_strs: Optional[List[str]] = None) -> str:
+def get_completion(model: str, prompt: str, temperature: float = 0.0, max_tokens: int = 256, stop_strs: Optional[List[str]] = None) -> str:
     response = openai.Completion.create(
-        model='text-davinci-003',
+        model=model,
         prompt=prompt,
         temperature=temperature,
         max_tokens=max_tokens,
